@@ -3,7 +3,7 @@ name: Deploy Hexo to GitHub Pages
 on:
   push:
     branches:
-      - main # 如果你的預設分支是 master，請改成 master
+      - main
 
 jobs:
   build-and-deploy:
@@ -15,10 +15,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # 可以根據你的 Node.js 版本調整
+          node-version: '20'
 
       - name: Install dependencies
         run: npm ci
+
+      # ✨ 關鍵新增步驟：在雲端建立 themes/butterfly 捷徑，解決找不到主題與跑版問題
+      - name: Link theme from node_modules
+        run: |
+          mkdir -p themes
+          ln -s ../node_modules/hexo-theme-butterfly themes/butterfly
 
       - name: Generate static files
         run: npx hexo generate
@@ -27,4 +33,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public # Hexo 編譯出來的靜態檔案資料夾
+          publish_dir: ./public
