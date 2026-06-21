@@ -1,9 +1,9 @@
-name: Deploy Hexo to GitHub Pages
+name: Pages
 
 on:
   push:
     branches:
-      - main
+      - main # 如果你的預設分支是 master，請改成 master
 
 # 設定 GitHub Actions 的權限，允許它上傳網頁內容到 Pages
 permissions:
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 建立主題捷徑，確保 Hexo 能在雲端順利抓到 npm 版本的 butterfly
+      # ✨ 核心相容步驟：在 Actions 虛擬環境建立主題軟連結，確保能抓到 npm 的 Butterfly 主題
       - name: Link theme from node_modules
         run: |
           mkdir -p themes
@@ -43,13 +43,13 @@ jobs:
       - name: Generate static files
         run: npx hexo generate
 
-      # 官方魔法一：將編譯好的 public 資料夾打包上傳
+      # 官方指定步驟一：將編譯好的 public 資料夾打包上傳
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
-      # 官方魔法二：直接把打包好的網頁發布到 GitHub Pages
+      # 官方指定步驟二：直接把打包好的網頁發布到 GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
