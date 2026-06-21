@@ -20,7 +20,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps: deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }} # ✨ 這裡已修正：改為 steps.deployment
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -43,13 +43,13 @@ jobs:
       - name: Generate static files
         run: npx hexo generate
 
-      # ✨ 官方魔法一：將編譯好的 public 資料夾打包上傳
+      # 官方魔法一：將編譯好的 public 資料夾打包上傳
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
-      # ✨ 官方魔法二：直接把打包好的網頁發布到 GitHub Pages
+      # 官方魔法二：直接把打包好的網頁發布到 GitHub Pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
