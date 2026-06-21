@@ -20,61 +20,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # ✨ 這裡已修正：改為 steps.deployment
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-
-      # 建立主題捷徑，確保 Hexo 能在雲端順利抓到 npm 版本的 butterfly
-      - name: Link theme from node_modules
-        run: |
-          mkdir -p themes
-          ln -s ../node_modules/hexo-theme-butterfly themes/butterfly
-
-      - name: Generate static files
-        run: npx hexo generate
-
-      # 官方魔法一：將編譯好的 public 資料夾打包上傳
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./public
-
-      # 官方魔法二：直接把打包好的網頁發布到 GitHub Pages
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4name: Deploy Hexo to GitHub Pages
-
-on:
-  push:
-    branches:
-      - main
-
-# 設定 GitHub Actions 的權限，允許它上傳網頁內容到 Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# 避免多個部署同時衝突
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # ✨ 這裡已修正：改為 steps.deployment
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
