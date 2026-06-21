@@ -5,8 +5,22 @@ on:
     branches:
       - main
 
+# 設定 GitHub Actions 的權限，允許它上傳網頁內容到 Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 避免多個部署同時衝突
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps: deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
@@ -20,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # ✨ 關鍵新增步驟：在雲端建立 themes/butterfly 捷徑，解決找不到主題與跑版問題
+      # 建立主題捷徑，確保 Hexo 能在雲端順利抓到 npm 版本的 butterfly
       - name: Link theme from node_modules
         run: |
           mkdir -p themes
@@ -29,8 +43,13 @@ jobs:
       - name: Generate static files
         run: npx hexo generate
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      # ✨ 官方魔法一：將編譯好的 public 資料夾打包上傳
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
+          path: ./public
+
+      # ✨ 官方魔法二：直接把打包好的網頁發布到 GitHub Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
